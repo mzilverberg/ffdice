@@ -4,7 +4,7 @@ dynamic = [
   "version"
 ]
 authors = [
-  { name="FrisFruitig", email="info@frisfruitig.com" },
+  { name="mzilverberg", email="maarten@mzilverberg.nl" },
 ]
 description = "A basic random number generator (RNG) that can be used for multiple purposes, such as rolling dice."
 readme = "README.md"
@@ -19,8 +19,8 @@ classifiers = [
 path = "ffdice/__about__.py"
 
 [project.urls]
-"Homepage" = "https://github.com/frisfruitig/ffdice"
-"Bug Tracker" = "https://github.com/frisfruitig/ffdice/issues"
+"Homepage" = "https://github.com/mzilverberg/ffdice"
+"Bug Tracker" = "https://github.com/mzilverberg/ffdice/issues"
 
 [build-system]
 requires = ["hatchling"]
