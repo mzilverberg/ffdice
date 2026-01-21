@@ -5,10 +5,37 @@ on:
   push:
     branches-ignore:
       - main
+  workflow_dispatch:
+    inputs:
+      bump-type:
+        description: 'Bump type'
+        required: true
+        default: 'pre_n'
+        type: choice
+        options:
+        - major
+        - minor
+        - patch
+        - pre_n
 
 jobs:
+  bump-version:
+    name: Bump development version
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v6
+    - name: Define new alpha version 🔤
+      id: bump
+      uses: callowayproject/bump-my-version@master
+      with:
+        args: ${{ inputs.bump-type }}
+    - name: Output new version 🔖
+      run: echo "New version is ${{ steps.bump.outputs.new_version }}"
+
   build:
     name: Build distribution 📦
+    needs:
+    - bump-version
     runs-on: ubuntu-latest
 
     steps:
