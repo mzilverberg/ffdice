@@ -25,3 +25,18 @@ path = "ffdice/__about__.py"
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.bumpversion]
+current_version = "1.1.0"
+serialize = [
+    "{major}.{minor}.{patch}.{pre_l}{$pre_n}",
+    "{major}.{minor}.{patch}",
+]
+message = "Version updated from {current_version} to {new_version}"
+pre_commit_hooks = ["uv sync --upgrade", "git add uv.lock"]
+
+[tool.bumpversion.parts.pre_l]
+values = ["dev", "rc", "final"]
+
+[[tool.bumpversion.files]]
+filename = "ffdice/__about__.py"
