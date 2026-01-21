@@ -8,15 +8,16 @@ on:
   workflow_dispatch:
     inputs:
       bump-type:
-        description: 'Bump type'
+        description: 'What kind of release is this?'
         required: true
-        default: 'pre_n'
+        default: 'dev'
         type: choice
         options:
+        - auto
         - major
         - minor
         - patch
-        - pre_n
+        - dev
 
 jobs:
   bump-version:
@@ -24,6 +25,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v6
+    - name: Get current version 🔍
+      id: get_version
+      run: >-
+        CURRENT_VERSION = $(sed 's/.*"\([^"]*\)".*/\1/' ffdice/__about__.py)
+        echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
     - name: Define new alpha version 🔤
       id: bump
       uses: callowayproject/bump-my-version@master
@@ -32,54 +38,54 @@ jobs:
     - name: Output new version 🔖
       run: echo "New version is ${{ steps.bump.outputs.new_version }}"
 
-  build:
-    name: Build distribution 📦
-    needs:
-    - bump-version
-    runs-on: ubuntu-latest
+  # build:
+  #   name: Build distribution 📦
+  #   needs:
+  #   - bump-version
+  #   runs-on: ubuntu-latest
 
-    steps:
-    - uses: actions/checkout@v6
-      with:
-        persist-credentials: false
-    - name: Set up Python
-      uses: actions/setup-python@v6
-      with:
-        python-version: '3.x'
-    - name: Install pypa/build
-      run: >-
-        python3 -m 
-        pip install
-        build
-        --user
-    - name: Build a binary wheel and source tarball
-      run: python3 -m build
-    - name: Store the distribution packages
-      uses: actions/upload-artifact@v5
-      with:
-        name: python-package-distributions
-        path: dist/
+  #   steps:
+  #   - uses: actions/checkout@v6
+  #     with:
+  #       persist-credentials: false
+  #   - name: Set up Python
+  #     uses: actions/setup-python@v6
+  #     with:
+  #       python-version: '3.x'
+  #   - name: Install pypa/build
+  #     run: >-
+  #       python3 -m 
+  #       pip install
+  #       build
+  #       --user
+  #   - name: Build a binary wheel and source tarball
+  #     run: python3 -m build
+  #   - name: Store the distribution packages
+  #     uses: actions/upload-artifact@v5
+  #     with:
+  #       name: python-package-distributions
+  #       path: dist/
 
-  publish-to-testpypi:
-    name: Publish Python 🐍 distribution 📦 to TestPyPI
-    needs:
-    - build
-    runs-on: ubuntu-latest
+  # publish-to-testpypi:
+  #   name: Publish Python 🐍 distribution 📦 to TestPyPI
+  #   needs:
+  #   - build
+  #   runs-on: ubuntu-latest
 
-    environment:
-      name: testpypi
-      url: https://test.pypi.org/p/ffdice
+  #   environment:
+  #     name: testpypi
+  #     url: https://test.pypi.org/p/ffdice
 
-    permissions:
-      id-token: write
+  #   permissions:
+  #     id-token: write
     
-    steps:
-    - name: Download all the dists
-      uses: actions/download-artifact@v6
-      with:
-        name: python-package-distributions
-        path: dist/
-    - name: Publish distribution 📦 to TestPyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        repository-url: https://test.pypi.org/legacy/
+  #   steps:
+  #   - name: Download all the dists
+  #     uses: actions/download-artifact@v6
+  #     with:
+  #       name: python-package-distributions
+  #       path: dist/
+  #   - name: Publish distribution 📦 to TestPyPI
+  #     uses: pypa/gh-action-pypi-publish@release/v1
+  #     with:
+  #       repository-url: https://test.pypi.org/legacy/
