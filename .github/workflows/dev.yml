@@ -28,8 +28,9 @@ jobs:
     - name: Get current version 🔍
       id: get_version
       run: >-
-        CURRENT_VERSION = $(sed 's/.*"\([^"]*\)".*/\1/' ffdice/__about__.py)
-        echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
+        CURRENT_VERSION=$(sed 's/.*"\([^"]*\)".*/\1/' ffdice/__about__.py)
+        echo "The current version is $CURRENT_VERSION"
+        $CURRENT_VERSION >> $GITHUB_ENV
     - name: Define new alpha version 🔤
       id: bump
       uses: callowayproject/bump-my-version@master
