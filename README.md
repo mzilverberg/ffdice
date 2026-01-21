@@ -10,7 +10,7 @@ Essentially, it's a random number generator (RNG) that can be used for multiple 
 You install this package by running the following command:
 
 ```
-python -m pip install ffdice
+python3 -m pip install ffdice
 ```
 
 ### Examples
@@ -22,7 +22,7 @@ Take a look at the [examples](examples/) for a few implementation ideas.
 In order to run automated tests, execute:
 
 ```
-python -m unittest
+python3 -m unittest
 ```
 
 ## Notes
