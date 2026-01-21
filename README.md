@@ -27,4 +27,4 @@ python -m unittest
 
 ## Notes
 
-This project was created both to learn and to scratch a personal itch. If you like it, or have any issues with it, feel free to [reach out by email](mailto:info@frisfruitig.com)!
+This project was created both to learn and to scratch a personal itch. Feel free to reach out and [submit an issue](https://github.com/mzilverberg/ffdice/issues) on GitHub if you encounter any problems with this package.
