@@ -5,19 +5,6 @@ on:
   push:
     branches-ignore:
       - main
-  workflow_dispatch:
-    inputs:
-      bump-type:
-        description: 'What kind of release is this?'
-        required: true
-        default: 'auto'
-        type: choice
-        options:
-        - auto
-        - major
-        - minor
-        - patch
-        - dev
 
 jobs:
   bump-version:
