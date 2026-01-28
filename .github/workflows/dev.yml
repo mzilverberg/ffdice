@@ -25,7 +25,7 @@ jobs:
     needs:
     - init
     steps:
-    - run: python3 -m unittest
+    - run: python -m unittest
 
   # bump-version:
   #   name: Bump development version
