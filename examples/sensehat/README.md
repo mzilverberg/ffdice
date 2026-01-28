@@ -6,9 +6,9 @@ This example shows how to use the output of the `roll()` method to create an ani
 
 You can run this example on your Raspberry Pi with a SenseHat with the following command:
 
-```
+```shell
 cd path/to/ffdice
-python -m examples.sensehat
+python3 -m examples.sensehat
 ```
 
 ## SenseHat emulator compatibility
