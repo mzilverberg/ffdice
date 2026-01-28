@@ -20,6 +20,8 @@ jobs:
   bump-version:
     name: Bump version
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.semver.outputs.version }}
     steps:
     - uses: actions/checkout@v6
       with:
@@ -33,7 +35,10 @@ jobs:
         minor_pattern: "/feat:/"
         version_format: "${major}.${minor}.${patch}"
     - name: Output new version
-      run: echo "VERSION=${{ steps.semver.outputs.version }}" >> $GITHUB_ENV
+      id: store-version
+      run: |
+        echo "VERSION=${{ steps.semver.outputs.version }}" >> $GITHUB_ENV
+        echo "VERSION=${{ steps.semver.outputs.version }}" >> $GITHUB_OUTPUT
     - name: Bump package version
       uses: DamianReeves/write-file-action@v1.3
       with:
@@ -54,7 +59,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v6
-    - run: git pull origin
+    - run: |
+        git pull origin
+        echo "VERSION=${{ needs.bump-version.outputs.version }}" >> $GITHUB_ENV
     - name: Create changelog
       id: changelog
       uses: ardalanamini/auto-changelog@v4.0.0
