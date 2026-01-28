@@ -13,7 +13,7 @@ env:
 
 jobs:
   bump-version:
-    name: Bump development version
+    name: Bump version
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v6
@@ -37,7 +37,7 @@ jobs:
         contents: |
           __version__ = "${{ env.VERSION }}"
         write-mode: overwrite
-    - name: Auto commit version bump
+    - name: Auto commit changes
       uses: stefanzweifel/git-auto-commit-action@v7.1.0
       with:
         commit_message: "ci: Version bump [ignore]"
@@ -52,7 +52,6 @@ jobs:
     steps:
     - uses: actions/checkout@v6
       with:
-        persist-credentials: false
         fetch-depth: 0 # Ensure auto commit of ffdice/__about__.py is part of the history.
     - name: Set up Python
       uses: actions/setup-python@v6
