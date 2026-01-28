@@ -1,10 +1,10 @@
-name: Create GitHub release and distribute package to TestPyPi
+name: Create release and publish Python package to PyPI
 
 # Restrict Action to main branch.
 on:
   push:
     branches:
-      - main
+      - chore/transfer-ownership
 
 # Initialize variable for package version.
 # This suppresses the 'Context access might be invalid' warning.
@@ -17,65 +17,106 @@ permissions:
   pull-requests: read
 
 jobs:
-  build:
+  bump-version:
+    name: Bump version
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.x"
-      # Prepare new version.
-      - name: Define new semantic version
-        id: update_version
-        uses: PaulHatch/semantic-version@v5.0.3
-        with:
-          tag_prefix: ""
-          major_pattern: "BREAKING: "
-          minor_pattern: "feat: "
-      - name: Output new version
-        run: |
-          echo "VERSION=${{steps.update_version.outputs.version}}" >> "$GITHUB_ENV"
-      - name: Create changelog
-        id: create_changelog
-        uses: ardalanamini/auto-changelog@v4.0.0
-        with:
-          release-name: ${{env.VERSION}}
-          include-compare-link: false
-      - name: Bump Python package version
-        uses: DamianReeves/write-file-action@v1.2
-        with:
-          path: ffdice/__about__.py
-          contents: |
-            __version__ = "${{env.VERSION}}"
-          write-mode: overwrite
-      - name: Git Auto Commit
-        uses: stefanzweifel/git-auto-commit-action@v4.16.0
-        with:
-          commit_message: "ci: Version bump [ignore]"
-          file_pattern: ffdice/*.py
-      # Create a new tag and release.
-      - name: Create tag
-        uses: rickstaa/action-create-tag@v1
-        with:
-          tag: ${{env.VERSION}}
-      - name: Create release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{env.VERSION}}
-          body: ${{steps.create_changelog.outputs.changelog}}
-      # Build Python package and distribute it to PyPI.
-      - name: Install pypa/build
-        run: >-
-          python -m pip install build --user
-      - name: Build Python package
-        run: >-
-          python -m build --sdist --wheel --outdir dist/ .
-      - name: Publish package to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          # Configure an Action secret in GitHub.
-          password: ${{secrets.PYPI_API_TOKEN}}
+    - uses: actions/checkout@v6
+      with:
+        fetch-depth: 0 # Ensure all tags are included when determining the new version.
+    - name: Define new version
+      id: semver
+      uses: PaulHatch/semantic-version@v6.0.0
+      with:
+        tag_prefix: ""
+        major_pattern: "/!:|BREAKING:/"
+        minor_pattern: "/feat:/"
+        version_format: "${major}.${minor}.${patch}"
+    - name: Output new version
+      run: echo "VERSION=${{ steps.semver.outputs.version }}" >> $GITHUB_ENV
+    - name: Bump package version
+      uses: DamianReeves/write-file-action@v1.3
+      with:
+        path: ffdice/__about__.py
+        contents: |
+          __version__ = "${{ env.VERSION }}"
+        write-mode: overwrite
+    - name: Auto commit changes
+      uses: stefanzweifel/git-auto-commit-action@v7.1.0
+      with:
+        commit_message: "ci: Version bump [ignore]"
+        file_pattern: ffdice/*.py
+  
+  release:
+    name: Create tag and release
+    needs:
+      - bump-version
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v6
+    - run: git pull origin
+    - name: Create changelog
+      id: changelog
+      uses: ardalanamini/auto-changelog@v4.0.0
+      with:
+        release-name: ${{ env.VERSION }}
+        include-compare-link: false
+    - name: Create tag
+      uses: rickstaa/action-create-tag@v1
+      with:
+        tag: ${{ env.VERSION }}
+    - name: Create release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ env.VERSION }}
+        body: ${{ steps.changelog.outputs.changelog }}
+        
+  # build:
+  #   name: Build package
+  #   needs:
+  #     - bump-version
+  #   runs-on: ubuntu-latest
+  #   steps:  
+  #   - uses: actions/checkout@v6
+  #   - run: git pull origin
+  #   - name: Set up Python
+  #     uses: actions/setup-python@v6
+  #     with:
+  #       python-version: '3.x'
+  #   - name: Install pypa/build
+  #     run: >-
+  #       python3 -m 
+  #       pip install
+  #       build
+  #       --user
+  #   - name: Build a binary wheel and source tarball
+  #     run: python3 -m build
+  #   - name: Store the packages
+  #     uses: actions/upload-artifact@v5
+  #     with:
+  #       name: python-package-distributions
+  #       path: dist/
+
+  # publish-to-testpypi:
+  #   name: Publish to TestPyPI
+  #   needs:
+  #   - build
+  #   runs-on: ubuntu-latest
+
+  #   environment:
+  #     name: testpypi
+  #     url: https://test.pypi.org/p/ffdice
+
+  #   permissions:
+  #     id-token: write
+    
+  #   steps:
+  #   - name: Download artifacts
+  #     uses: actions/download-artifact@v6
+  #     with:
+  #       name: python-package-distributions
+  #       path: dist/
+  #   - name: Publish package to TestPyPI
+  #     uses: pypa/gh-action-pypi-publish@release/v1
+  #     with:
+  #       repository-url: https://test.pypi.org/legacy/
