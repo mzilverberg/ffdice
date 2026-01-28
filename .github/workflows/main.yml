@@ -4,7 +4,7 @@ name: Create release and publish Python package to PyPI
 on:
   push:
     branches:
-      - chore/transfer-ownership
+      - main
 
 # Initialize variable for package version.
 # This suppresses the 'Context access might be invalid' warning.
@@ -111,8 +111,8 @@ jobs:
     runs-on: ubuntu-latest
 
     environment:
-      name: testpypi
-      url: https://test.pypi.org/p/ffdice
+      name: pypi
+      url: https://pypi.org/p/ffdice
 
     permissions:
       id-token: write
@@ -125,5 +125,3 @@ jobs:
         path: dist/
     - name: Publish package to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        repository-url: https://test.pypi.org/legacy/
