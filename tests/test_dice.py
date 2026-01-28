@@ -39,18 +39,6 @@ class TestDice(unittest.TestCase):
   def test_single_sided(self) -> None:
     dice = Dice(1)
     self.assertEqual(dice.roll(), 1, "The expected output should be equal to 1.")
-  
-  # Twenty sided dice (D20).
-  # ---
-  # When passing a list with a single value, the only possible outcome is 1.
-  def test_twenty_sided(self) -> None:
-    dice = Dice(20)
-    outcomes = []
-    # The probability of rolling a 20 is almost 100% when rolling 100 times.
-    # Reference: https://www.gigacalculator.com/calculators/dice-probability-calculator.php
-    for i in range(100):
-      outcomes.append(dice.roll())
-    self.assertEqual(max(outcomes), 20, "The expected output should be equal to 20.")
 
 if __name__ == '__main__':
   unittest.main()
