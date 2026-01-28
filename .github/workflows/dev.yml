@@ -27,7 +27,7 @@ jobs:
         version_format: "${major}.${minor}.${patch}-dev${increment}"
         namespace: "dev"
     - name: Output new version 🔖
-      run: echo "New version is ${{ steps.semver.outputs.version }}" >> $GITHUB_ENV
+      run: echo "VERSION=${{ steps.semver.outputs.version }}" >> $GITHUB_ENV
     - name: Bump Python package version 🐍
       uses: DamianReeves/write-file-action@v1.3
       with:
