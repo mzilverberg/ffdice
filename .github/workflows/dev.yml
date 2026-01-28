@@ -50,6 +50,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:  
     - uses: actions/checkout@v6
+    - run: git pull origin
     - name: Set up Python
       uses: actions/setup-python@v6
       with:
